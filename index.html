@@ -5,12 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- TODO: Get module locally instead of from CDN. -->
-    <script src="https://cdn.jsdelivr.net/npm/@wsdot/route-selector@0.0.2/index.mjs" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@wsdot/route-selector@0.0.2/index.mjs" type="module"
+        integrity="sha256-B/3cz34NF4vPaj/0y8KLkR7BZG8WZC3av19az9R6N1U="></script>
     <title>Document</title>
 </head>
 
 <body>
-    <route-selector id="routeSelector"></route-selector>
+    <form>
+        <route-selector id="routeSelector" name="route"></route-selector>
+        <button type="submit">Submit</button>
+    
+    </form>
     <script src="dist/main.js"></script>
 </body>
 

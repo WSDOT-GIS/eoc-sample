@@ -4,7 +4,8 @@
   "description": "Demonstrates use of custom WSDOT controls",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepare": "webpack",
+    "watch": "webpack -w"
   },
   "keywords": [],
   "private": true,
