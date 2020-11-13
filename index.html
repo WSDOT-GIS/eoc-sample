@@ -4,19 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- TODO: Get module locally instead of from CDN. -->
+    <!-- TODO: Get module locally instead of from CDN. 
+        Create build script to copy the module file from node_modules
+        subfolder to "dist" folder. -->
     <script src="https://cdn.jsdelivr.net/npm/@wsdot/route-selector@0.0.2/index.mjs" type="module"
         integrity="sha256-B/3cz34NF4vPaj/0y8KLkR7BZG8WZC3av19az9R6N1U="></script>
-    <title>Document</title>
+    <title>Demo</title>
 </head>
 
 <body>
     <form>
+        <label for="routeSelector">Route</label>
         <route-selector id="routeSelector" name="route"></route-selector>
+        <label for="srmp1">Begin SRMP</label>
+        <input id="srmp1" type="number" min="0" step="0.001" required />
+        <label for="srmp2">End SRMP</label>
+        <input id="srmp2" type="number" min="0" step="0.001" />
+        <label for="decreaseCheckbox">Decrease</label><input id="decreaseCheckbox" type="checkbox" />
         <button type="submit">Submit</button>
-    
     </form>
-    <script src="dist/main.js"></script>
+    <div>
+        <label for="countyBox">County</label>
+        <input id="countyBox" type="text" readonly />
+        <label for="regionBox">Region</label>
+        <input id="regionBox" type="text" readonly />
+    </div>
+    <script src="src/index.js" type="module"></script>
 </body>
 
 </html>
