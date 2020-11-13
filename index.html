@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- TODO: Get module locally instead of from CDN. 
-        Create build script to copy the module file from node_modules
-        subfolder to "dist" folder. -->
+    <!-- 
+        Load the WSDOT Route Selector module. 
+        Code for this module is at: https://github.com/WSDOT-GIS/route-selector
+    -->
     <script src="https://cdn.jsdelivr.net/npm/@wsdot/route-selector@0.0.2/index.mjs" type="module"
         integrity="sha256-B/3cz34NF4vPaj/0y8KLkR7BZG8WZC3av19az9R6N1U="></script>
     <title>Demo</title>
@@ -29,6 +30,7 @@
         <label for="regionBox">Region</label>
         <input id="regionBox" type="text" readonly />
     </div>
+    <!-- Import custom javascript module for this page -->
     <script src="src/index.js" type="module"></script>
 </body>
 

@@ -21,6 +21,13 @@ function objectIsPoint(geometry) {
     return geometry.hasOwnProperty("x") && geometry.hasOwnProperty("y");
 }
 
+/**
+ * 
+ * @param {*} routeGeometry 
+ * @param {number} inSR 
+ * @param {string} layerQueryUrl 
+ * @param {string} featureNameField 
+ */
 async function getFeatureNameForGeometry(routeGeometry, inSR,
     layerQueryUrl,
     featureNameField) {
@@ -60,15 +67,13 @@ async function getFeatureNameForGeometry(routeGeometry, inSR,
 theForm.addEventListener("submit", function (e) {
 
     try {
-        /**
-         * @type {string}
-         */
+        /** @type {string} */
         const route = document.getElementById("routeSelector").value
         /** @type {number} */
         const srmp1 = document.getElementById("srmp1").valueAsNumber;
         /** @type {?number} */
         let srmp2 = document.getElementById("srmp2").valueAsNumber;
-
+        /** @type {boolean} */
         const isDecrease = document.getElementById("decreaseCheckbox").checked;
 
         const now = new Date;
@@ -82,7 +87,6 @@ theForm.addEventListener("submit", function (e) {
             Decrease: isDecrease
         };
 
-        console.log("location", location);
 
 
         const elcUrl = new URL(findRouteLocationsUrl)
@@ -106,8 +110,11 @@ theForm.addEventListener("submit", function (e) {
                 countyQueryUrl,
                 countyFeatureNameField
             ).then(counties => {
+                // Convert the set to an array, then convert to comma separated list.
                 const countyBox = document.getElementById("countyBox");
                 countyBox.value = new Array(...counties).join(",");
+            }, error => {
+                console.error("Error getting county information", error);
             });
 
             // Query county feature layer
@@ -118,7 +125,10 @@ theForm.addEventListener("submit", function (e) {
                 regionFeatureNameField
             ).then(regions => {
                 const regionBox = document.getElementById("regionBox");
+                // Convert the set to an array, then convert to comma separated list.
                 regionBox.value = new Array(...regions).join(",");
+            }, error => {
+                console.error("Error getting region information", error);
             });
         });
     }
