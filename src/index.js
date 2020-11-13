@@ -7,6 +7,9 @@ const elcRoot = "https://data.wsdot.wa.gov/arcgis/rest/services/Shared/ElcRestSO
 const routesUrl = `${elcRoot}/routes?f=json`;
 const findRouteLocationsUrl = `${elcRoot}/Find%20Route%20Locations`;
 const regionQueryUrl = "https://data.wsdot.wa.gov/arcgis/rest/services/Shared/RegionBoundaries/MapServer/0/query";
+const countyQueryUrl = "https://data.wsdot.wa.gov/arcgis/rest/services/Shared/CountyBoundaries/MapServer/0/query";
+const countyFeatureNameField = "JURLBL";
+const regionFeatureNameField = "RegionName";
 
 /**
  * Checks an object to see if it has an "x" and "y" property,
@@ -18,38 +21,35 @@ function objectIsPoint(geometry) {
     return geometry.hasOwnProperty("x") && geometry.hasOwnProperty("y");
 }
 
-async function getCountyForRouteGeometry(routeGeometry) {
-    const countyQueryUrl = "https://data.wsdot.wa.gov/arcgis/rest/services/Shared/CountyBoundaries/MapServer/0/query";
-    const countyNameField = "JURLBL";
+async function getFeatureNameForGeometry(routeGeometry, inSR,
+    layerQueryUrl,
+    featureNameField) {
 
     const params = new URLSearchParams();
-    params.set("outFields", countyNameField);
+    params.set("outFields", featureNameField);
     params.set("returnGeometry", false);
     params.set("f", "json");
 
     const isPoint = objectIsPoint(routeGeometry);
 
-    params.set("inSR", routeGeometry.spatialReference.wkid);
-    delete routeGeometry.spatialReference;
+    params.set("inSR", inSR);
     const geometryType = `esriGeometry${isPoint ? "Point" : "Polyline"}`;
     params.set("geometry", JSON.stringify(routeGeometry));
     params.set("geometryType", geometryType);
     params.set("spatialRel", `esriSpatialRel${isPoint ? "Within" : "Intersects"}`);
 
-    const queryResults = await fetch(countyQueryUrl, {
+    const queryResults = await fetch(layerQueryUrl, {
         body: params.toString(),
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         method: "POST"
     }).then(qr => qr.json());
-
-    console.debug("county query results", queryResults);
 
     const outputSet = new Set();
 
     const features = queryResults.features;
 
     for (const feature of features) {
-        const county = feature.attributes[countyNameField];
+        const county = feature.attributes[featureNameField];
         outputSet.add(county);
     }
 
@@ -78,7 +78,7 @@ theForm.addEventListener("submit", function (e) {
         const location = {
             Route: route,
             Srmp: srmp1,
-            EndSrmp: srmp2,
+            EndSrmp: !isNaN(srmp2) ? srmp2 : null,
             Decrease: isDecrease
         };
 
@@ -93,32 +93,34 @@ theForm.addEventListener("submit", function (e) {
 
         fetch(elcUrl.toString()).then(r => r.json()).then(response => {
 
-            console.log("elc response", response);
-
             const location = response[0];
             const geometry = location.RouteGeometry;
             delete geometry.__type;
+            const inSR = geometry.spatialReference.wkid;
+            delete geometry.spatialReference;
 
-            console.log("geometry", geometry);
-
-            getCountyForRouteGeometry(geometry).then(counties => {
-                console.debug("counties", counties);
+            // Query county feature layer
+            getFeatureNameForGeometry(
+                geometry,
+                inSR,
+                countyQueryUrl,
+                countyFeatureNameField
+            ).then(counties => {
                 const countyBox = document.getElementById("countyBox");
                 countyBox.value = new Array(...counties).join(",");
             });
 
-
-
-            // TODO: query map service layers to see which features intersect the geometry.
+            // Query county feature layer
+            getFeatureNameForGeometry(
+                geometry,
+                inSR,
+                regionQueryUrl,
+                regionFeatureNameField
+            ).then(regions => {
+                const regionBox = document.getElementById("regionBox");
+                regionBox.value = new Array(...regions).join(",");
+            });
         });
-
-        // const routeLocations = routeLocator.findRouteLocations({
-        //     // Set reference date to current date.
-        //     locations: [
-        //         location
-        //     ]
-        // });
-
     }
     catch (err) {
         console.error(err);
